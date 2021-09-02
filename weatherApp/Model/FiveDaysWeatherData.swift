@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FiveDaysWeatherData: Codable {
+struct FiveDaysWeatherData: Codable  {
     let list: [DayWeatherData]
 }
 

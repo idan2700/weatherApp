@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SingleCityTableViewCell: UITableViewCell {
+class SingleCityTableViewCell: UITableViewCell  {
     @IBOutlet weak var weatherIcon: UIImageView!
     @IBOutlet weak var day: UILabel!
     @IBOutlet weak var weatherDescripition: UILabel!

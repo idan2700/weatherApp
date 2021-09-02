@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ServiceError: Error {
+enum ServiceError: Error  {
     case badUrl
     case failureReason
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AllCitiesWeatherData: Codable {
+struct AllCitiesWeatherData: Codable  {
     let list: [CityWeatherData]
 }
 

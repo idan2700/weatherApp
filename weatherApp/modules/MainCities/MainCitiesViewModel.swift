@@ -20,7 +20,7 @@ protocol MainCitiesViewModelDelegate: AnyObject {
     func showError(with message: String)
 }
 
-class MainCitiesViewModel {
+class MainCitiesViewModel  {
     
     weak var delegate: MainCitiesViewModelDelegate?
     var choosenViewModel: MainCitiesCellViewModel!

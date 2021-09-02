@@ -18,7 +18,7 @@ protocol SingleCityViewModelDelegate: AnyObject {
     func updateMainDegreesUI()
 }
 
-class SingleCityViewModel {
+class SingleCityViewModel  {
     var choosenCityCellViewModel: MainCitiesCellViewModel
     weak var delegate: SingleCityViewModelDelegate?
     private var displayedDaysCellViewModels = [SingleCityCellViewModel]()

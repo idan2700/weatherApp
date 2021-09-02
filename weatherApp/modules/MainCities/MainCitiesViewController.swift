@@ -16,7 +16,7 @@ class MainCitiesViewController: UIViewController {
     @IBOutlet weak var noCityLabel: UILabel!
     var viewModel = MainCitiesViewModel()
     
-    override func viewDidLoad() {
+    override func viewDidLoad()  {
         super.viewDidLoad()
         viewModel.delegate = self
         tableView.dataSource = self

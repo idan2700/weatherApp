@@ -18,7 +18,7 @@ class SingleCityViewController: UIViewController {
     @IBOutlet weak var loader: UIActivityIndicatorView!
     var viewModel: SingleCityViewModel!
     
-    override func viewDidLoad() {
+    override func viewDidLoad()  {
         super.viewDidLoad()
         viewModel.delegate = self
         tableView.dataSource = self

@@ -12,7 +12,7 @@ protocol MainCitiesCellViewModelDelegate: AnyObject {
     func updateIcon(with image: UIImage)
 }
 
-class MainCitiesCellViewModel {
+class MainCitiesCellViewModel  {
     
     private var currentWeather: CityWeatherData
     var minDegrees = 0

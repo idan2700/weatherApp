@@ -12,7 +12,7 @@ protocol SingleCityCellViewModelDelegate: AnyObject {
     func updateIcon(with image: UIImage)
 }
 
-class SingleCityCellViewModel {
+class SingleCityCellViewModel  {
     var isCelsius: Bool
     weak var delegate: SingleCityCellViewModelDelegate?
     private var currentWeather: DayWeatherData
