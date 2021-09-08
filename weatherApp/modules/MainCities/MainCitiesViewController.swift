@@ -8,12 +8,14 @@
 import UIKit
 
 class MainCitiesViewController: UIViewController {
+    
     @IBOutlet weak var celsiusButton: UIBarButtonItem!
     @IBOutlet weak var fahrenheitButton: UIBarButtonItem!
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var loader: UIActivityIndicatorView!
     @IBOutlet weak var noCityLabel: UILabel!
+    
     var viewModel = MainCitiesViewModel()
     
     override func viewDidLoad() {
@@ -24,18 +26,23 @@ class MainCitiesViewController: UIViewController {
         searchBar.delegate = self
         viewModel.start()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        viewModel.willAppear()
+    }
 
     @IBAction func celsiusPressed(_ sender: UIBarButtonItem) {
-        viewModel.didTapCelsius()
+        viewModel.didChangeDegreesPresention(isCelsius: true)
     }
     @IBAction func fahrenheitPressed(_ sender: UIBarButtonItem) {
-        viewModel.didTapFahrenheit()
+        viewModel.didChangeDegreesPresention(isCelsius: false)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == K.Segue.mainToSingle {
             guard let singleCityVC = segue.destination as? SingleCityViewController else {return}
-            singleCityVC.viewModel = SingleCityViewModel(choosenCityCellViewModel: viewModel.choosenViewModel, isTempInCelsius: viewModel.isTempInCelsius)
+            singleCityVC.viewModel = SingleCityViewModel(choosenCityCellViewModel: viewModel.choosenViewModel, isCelsius: viewModel.isCelsius, mainCitiesViewModel: viewModel)
         }
     }
 }
@@ -62,12 +69,23 @@ extension MainCitiesViewController: UITableViewDelegate {
 extension MainCitiesViewController: UISearchBarDelegate {    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if let text = searchBar.text {
-        viewModel.didChangeText(text)
+            viewModel.didChangeText(text)
         }
     }
 }
 
 extension MainCitiesViewController: MainCitiesViewModelDelegate {
+    
+    func setDegrees(isCelsius: Bool) {
+        if isCelsius {
+            celsiusButton.tintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+            fahrenheitButton.tintColor = #colorLiteral(red: 0.9903846154, green: 0.9807692308, blue: 1, alpha: 0.5048323675)
+        } else {
+            fahrenheitButton.tintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+            celsiusButton.tintColor = #colorLiteral(red: 0.9903846154, green: 0.9807692308, blue: 1, alpha: 0.5048323675)
+        }
+    }
+    
     func showNoCityLabel() {
         noCityLabel.isHidden = false
     }
@@ -88,18 +106,6 @@ extension MainCitiesViewController: MainCitiesViewModelDelegate {
     
     func moveToSingleCityVC() {
         performSegue(withIdentifier: K.Segue.mainToSingle, sender: self)
-    }
-    
-    func chooseCelsius() {
-        viewModel.isTempInCelsius = true
-        celsiusButton.tintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        fahrenheitButton.tintColor = #colorLiteral(red: 0.9903846154, green: 0.9807692308, blue: 1, alpha: 0.5048323675)
-    }
-    
-    func chooseFahrenheit() {
-        viewModel.isTempInCelsius = false
-        fahrenheitButton.tintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        celsiusButton.tintColor = #colorLiteral(red: 0.9903846154, green: 0.9807692308, blue: 1, alpha: 0.5048323675)
     }
     
     func reloadData() {

@@ -13,17 +13,13 @@ protocol SingleCityCellViewModelDelegate: AnyObject {
 }
 
 class SingleCityCellViewModel {
-    var isCelsius: Bool
-    weak var delegate: SingleCityCellViewModelDelegate?
-    private var currentWeather: DayWeatherData
-    var iconImage = UIImage() {
-       didSet {
-        delegate?.updateIcon(with: iconImage)
-       }
-   }
     
-    init(currentWeather: DayWeatherData, isCelsius: Bool) {
-        self.isCelsius = isCelsius
+    var isCelsius: Bool = true
+    weak var delegate: SingleCityCellViewModelDelegate?
+    
+    private var currentWeather: DayWeatherData
+    
+    init(currentWeather: DayWeatherData) {
         self.currentWeather = currentWeather
         getIcon()
     }
@@ -55,6 +51,12 @@ class SingleCityCellViewModel {
         return "\((min * Int(1.8)) + 32)°-\((max * Int(1.8)) + 32)°"
         }
     }
+    
+    var iconImage = UIImage() {
+       didSet {
+        delegate?.updateIcon(with: iconImage)
+       }
+   }
     
     func getIcon() {
         ApiManager.shared.getImageIcon(with: currentWeather.weather[0].icon) { result in

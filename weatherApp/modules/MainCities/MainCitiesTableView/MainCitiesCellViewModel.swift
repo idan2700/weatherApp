@@ -14,21 +14,16 @@ protocol MainCitiesCellViewModelDelegate: AnyObject {
 
 class MainCitiesCellViewModel {
     
-    private var currentWeather: CityWeatherData
     var minDegrees = 0
     var maxDegrees = 0
-    var isCelsius: Bool
+    var isCelsius = true
     weak var delegate: MainCitiesCellViewModelDelegate?
-    var iconImage = UIImage() {
-        didSet {
-            delegate?.updateIcon(with: iconImage)
-        }
-    }
-
-    init(currentWeather: CityWeatherData, isCelsius: Bool) {
+    
+    private var currentWeather: CityWeatherData
+    
+    init(currentWeather: CityWeatherData) {
         self.currentWeather = currentWeather
-        self.isCelsius = isCelsius
-        self.getIcon()
+        getIcon()
     }
     
     var cityName: String? {
@@ -50,6 +45,12 @@ class MainCitiesCellViewModel {
         return "\(minDegrees)°-\(maxDegrees)°"
         } else {
             return "\((minDegrees * Int(1.8)) + 32)°-\((maxDegrees * Int(1.8)) + 32)°"
+        }
+    }
+    
+    var iconImage = UIImage() {
+        didSet {
+            delegate?.updateIcon(with: iconImage)
         }
     }
     

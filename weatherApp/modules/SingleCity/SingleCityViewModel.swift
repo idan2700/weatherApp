@@ -8,8 +8,7 @@
 import Foundation
 
 protocol SingleCityViewModelDelegate: AnyObject {
-    func chooseCelsius()
-    func chooseFahrenheit()
+    func setDegrees(isCelsius: Bool)
     func reloadData()
     func showLoader()
     func removeLoader()
@@ -19,30 +18,27 @@ protocol SingleCityViewModelDelegate: AnyObject {
 }
 
 class SingleCityViewModel {
+    
     var choosenCityCellViewModel: MainCitiesCellViewModel
+    var isCelsius: Bool
     weak var delegate: SingleCityViewModelDelegate?
+    
     private var displayedDaysCellViewModels = [SingleCityCellViewModel]()
-    var isTempInCelsius: Bool
+    private var mainCitiesViewModel = MainCitiesViewModel()
     
-    init(choosenCityCellViewModel: MainCitiesCellViewModel, isTempInCelsius: Bool) {
+    init(choosenCityCellViewModel: MainCitiesCellViewModel, isCelsius: Bool, mainCitiesViewModel: MainCitiesViewModel) {
         self.choosenCityCellViewModel = choosenCityCellViewModel
-        self.isTempInCelsius = isTempInCelsius
+        self.isCelsius = isCelsius
+        self.mainCitiesViewModel = mainCitiesViewModel
     }
     
-    func didTapCelsius() {
-        delegate?.chooseCelsius()
+    func didChangeDegreesPresention(isCelsius: Bool) {
+        self.isCelsius = isCelsius
+        delegate?.setDegrees(isCelsius: isCelsius)
         for viewModel in displayedDaysCellViewModels {
-            viewModel.isCelsius = true
+            viewModel.isCelsius = isCelsius
         }
-        delegate?.updateMainDegreesUI()
-        delegate?.reloadData()
-    }
-    
-    func didTapFahrenheit() {
-        delegate?.chooseFahrenheit()
-        for viewModel in displayedDaysCellViewModels {
-            viewModel.isCelsius = false
-        }
+        mainCitiesViewModel.isCelsius = isCelsius
         delegate?.updateMainDegreesUI()
         delegate?.reloadData()
     }
@@ -65,14 +61,14 @@ class SingleCityViewModel {
                 self.delegate?.removeLoader()
                 switch result {
                 case .success(let weatherData):
-                    let filterdWeather = weatherData.list.filter {$0.dt_txt.contains("00:00:00")}
+                    let filterdWeather = weatherData.filter {$0.dt_txt.contains("00:00:00")}
                     for weather in filterdWeather {
-                        self.displayedDaysCellViewModels.append(SingleCityCellViewModel(currentWeather: weather, isCelsius: self.isTempInCelsius))
+                        self.displayedDaysCellViewModels.append(SingleCityCellViewModel(currentWeather: weather))
                     }
                 case .failure(let error):
                     self.delegate?.showError(with: error.localizedDescription)
                 }
-                self.delegate?.reloadData()
+                self.didChangeDegreesPresention(isCelsius: self.isCelsius)
             }
         }
     }
@@ -82,7 +78,7 @@ class SingleCityViewModel {
     }
     
     func createDegrees(min: Int, max: Int)-> String {
-        if isTempInCelsius == true {
+        if isCelsius {
         return "\(min)°-\(max)°"
         } else {
         return "\((min * Int(1.8)) + 32)°-\((max * Int(1.8)) + 32)°"

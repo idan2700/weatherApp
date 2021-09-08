@@ -13,7 +13,7 @@ class ApiManager {
     
     static let shared = ApiManager()
     
-    func fetchCurrentWeatherData(with url: String, complition: @escaping (Result<AllCitiesWeatherData,ServiceError>)-> Void) {
+    func fetchCurrentWeatherData(with url: String, complition: @escaping (Result<[CityWeatherData],ServiceError>)-> Void) {
         guard let url = URL(string: url) else {
             complition(.failure(.badUrl))
             return
@@ -27,7 +27,7 @@ class ApiManager {
                 let decoder = JSONDecoder()
                 let weatherData = try decoder.decode(AllCitiesWeatherData.self, from: data)
                 DispatchQueue.main.async {
-                    complition(.success(weatherData))
+                    complition(.success(weatherData.list))
                 }
             } catch {
                 complition(.failure(.failureReason))
@@ -35,7 +35,7 @@ class ApiManager {
         }
     }
     
-    func fetchFiveDaysWeatherData(with cityName: String, complition: @escaping (Result<FiveDaysWeatherData,ServiceError>)-> Void) {
+    func fetchFiveDaysWeatherData(with cityName: String, complition: @escaping (Result<[DayWeatherData],ServiceError>)-> Void) {
         let url = "\(K.Url.fiveDaysUrl)\(cityName)"
         guard let url = URL(string: url) else {
             complition(.failure(.badUrl))
@@ -50,7 +50,7 @@ class ApiManager {
                 let decoder = JSONDecoder()
                 let weatherData = try decoder.decode(FiveDaysWeatherData.self, from: data)
                 DispatchQueue.main.async {
-                    complition(.success(weatherData))
+                    complition(.success(weatherData.list))
                 }
             } catch {
                 complition(.failure(.failureReason))

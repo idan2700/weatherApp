@@ -8,6 +8,7 @@
 import UIKit
 
 class SingleCityViewController: UIViewController {
+    
     @IBOutlet weak var cityName: UILabel!
     @IBOutlet weak var currentWeatherIcon: UIImageView!
     @IBOutlet weak var currentDegrees: UILabel!
@@ -16,6 +17,7 @@ class SingleCityViewController: UIViewController {
     @IBOutlet weak var fahrenheitButton: UIBarButtonItem!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var loader: UIActivityIndicatorView!
+    
     var viewModel: SingleCityViewModel!
     
     override func viewDidLoad() {
@@ -26,11 +28,10 @@ class SingleCityViewController: UIViewController {
     }
     
     @IBAction func celsiusPressed(_ sender: UIBarButtonItem) {
-        viewModel.didTapCelsius()
-    }
+        viewModel.didChangeDegreesPresention(isCelsius: true)    }
     
     @IBAction func fahrenheitPressed(_ sender: UIBarButtonItem) {
-        viewModel.didTapFahrenheit()
+        viewModel.didChangeDegreesPresention(isCelsius: false)
     }
 }
 
@@ -55,6 +56,16 @@ extension SingleCityViewController: SingleCityViewModelDelegate {
         currentWeatherIcon.image = viewModel.choosenCityCellViewModel.iconImage
     }
     
+    func setDegrees(isCelsius: Bool) {
+        if isCelsius {
+            celsiusButton.tintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+            fahrenheitButton.tintColor = #colorLiteral(red: 0.9903846154, green: 0.9807692308, blue: 1, alpha: 0.5048323675)
+        } else {
+            fahrenheitButton.tintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+            celsiusButton.tintColor = #colorLiteral(red: 0.9903846154, green: 0.9807692308, blue: 1, alpha: 0.5048323675)
+        }
+    }
+    
     func showLoader() {
         loader.isHidden = false
         loader.startAnimating()
@@ -63,18 +74,6 @@ extension SingleCityViewController: SingleCityViewModelDelegate {
     func removeLoader() {
         loader.stopAnimating()
         loader.isHidden = true
-    }
-    
-    func chooseCelsius() {
-        viewModel.isTempInCelsius = true
-        celsiusButton.tintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        fahrenheitButton.tintColor = #colorLiteral(red: 0.9903846154, green: 0.9807692308, blue: 1, alpha: 0.5048323675)
-    }
-    
-    func chooseFahrenheit() {
-        viewModel.isTempInCelsius = false
-        fahrenheitButton.tintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        celsiusButton.tintColor = #colorLiteral(red: 0.9903846154, green: 0.9807692308, blue: 1, alpha: 0.5048323675)
     }
     
     func reloadData() {

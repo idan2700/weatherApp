@@ -8,6 +8,7 @@
 import UIKit
 
 class SingleCityTableViewCell: UITableViewCell {
+    
     @IBOutlet weak var weatherIcon: UIImageView!
     @IBOutlet weak var day: UILabel!
     @IBOutlet weak var weatherDescripition: UILabel!
@@ -15,8 +16,8 @@ class SingleCityTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        
     }
+    
     func configure(with cellViewModel: SingleCityCellViewModel) {
         cellViewModel.delegate = self
         day.text = cellViewModel.day
