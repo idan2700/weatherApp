@@ -1,21 +1,21 @@
 //
-//  MainCitiesCellViewModel.swift
+//  MainSingleCityCellViewModel.swift
 //  weatherApp
 //
-//  Created by Idan Levi on 23/08/2021.
+//  Created by Idan Levi on 12/09/2021.
 //
 
 import Foundation
 import UIKit
 
-protocol MainCitiesCellViewModelDelegate: AnyObject {
+protocol CurrentWeatherCellViewModelDelegate: AnyObject {
     func updateIcon(with image: UIImage)
 }
 
-class MainCitiesCellViewModel {
+class CurrentWeatherCellViewModel {
     
     var isCelsius = true
-    weak var delegate: MainCitiesCellViewModelDelegate?
+    weak var delegate: CurrentWeatherCellViewModelDelegate?
     
     private (set) var currentWeather: CityWeatherData
     
@@ -33,9 +33,9 @@ class MainCitiesCellViewModel {
     }
     
     var degrees: String {
-        return String().createDegrees(isCelsius: isCelsius,min: currentWeather.main.temp_min, max: currentWeather.main.temp_max)
+        return String().createDegrees(isCelsius: isCelsius, min: currentWeather.main.temp_min, max: currentWeather.main.temp_max)
     }
-    
+
     var iconImage = UIImage() {
         didSet {
             delegate?.updateIcon(with: iconImage)
@@ -51,9 +51,10 @@ class MainCitiesCellViewModel {
                 }
             case .failure(_):
                 if let image = UIImage(systemName: "nosign") {
-                self.iconImage = image
+                    self.iconImage = image
                 }
             }
         }
     }
 }
+

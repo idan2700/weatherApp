@@ -8,14 +8,14 @@
 import Foundation
 import UIKit
 
-protocol SingleCityCellViewModelDelegate: AnyObject {
+protocol DailyWeatherCellViewModelDelegate: AnyObject {
     func updateIcon(with image: UIImage)
 }
 
-class SingleCityCellViewModel {
+class DailyWeatherCellViewModel {
     
     var isCelsius: Bool = true
-    weak var delegate: SingleCityCellViewModelDelegate?
+    weak var delegate: DailyWeatherCellViewModelDelegate?
     
     private var currentWeather: DayWeatherData
     
@@ -39,17 +39,7 @@ class SingleCityCellViewModel {
     }
     
     var degrees: String {
-        return createDegrees(min: currentWeather.main.temp_min, max: currentWeather.main.temp_max)
-    }
-    
-    func createDegrees(min: Double, max: Double)-> String {
-        let min = Int(min)
-        let max = Int(max)
-        if isCelsius == true {
-        return "\(min)°-\(max)°"
-        } else {
-        return "\((min * Int(1.8)) + 32)°-\((max * Int(1.8)) + 32)°"
-        }
+        return String().createDegrees(isCelsius: isCelsius, min: currentWeather.main.temp_min, max: currentWeather.main.temp_max)
     }
     
     var iconImage = UIImage() {

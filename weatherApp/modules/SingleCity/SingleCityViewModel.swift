@@ -7,55 +7,71 @@
 
 import Foundation
 
+protocol isCelsiusDelegate: AnyObject {
+    func didPick(isCelsius: Bool)
+}
+
 protocol SingleCityViewModelDelegate: AnyObject {
     func setDegrees(isCelsius: Bool)
     func reloadData()
     func showLoader()
     func removeLoader()
-    func updateUI()
     func showError(with message: String)
-    func updateMainDegreesUI()
 }
 
 class SingleCityViewModel {
     
-    var choosenCityCellViewModel: MainCitiesCellViewModel
-    var isCelsius: Bool
+    var isCelsius: Bool {
+        didSet {
+            isCelsiusDelegate?.didPick(isCelsius: isCelsius)
+        }
+    }
     weak var delegate: SingleCityViewModelDelegate?
+    weak var isCelsiusDelegate: isCelsiusDelegate?
     
-    private var displayedDaysCellViewModels = [SingleCityCellViewModel]()
-    private var mainCitiesViewModel = MainCitiesViewModel()
+    private var items = [SingleCityItemType]()
+    private var choosenCityWeatherData: CityWeatherData
     
-    init(choosenCityCellViewModel: MainCitiesCellViewModel, isCelsius: Bool, mainCitiesViewModel: MainCitiesViewModel) {
-        self.choosenCityCellViewModel = choosenCityCellViewModel
+    init(choosenCityWeatherData: CityWeatherData, isCelsius: Bool, isCelsiusDelegate: isCelsiusDelegate) {
+        self.choosenCityWeatherData = choosenCityWeatherData
         self.isCelsius = isCelsius
-        self.mainCitiesViewModel = mainCitiesViewModel
+        self.isCelsiusDelegate = isCelsiusDelegate
+        self.items.append(SingleCityItemType.current(viewModel: CurrentWeatherCellViewModel(currentWeather: choosenCityWeatherData)))
     }
     
-    func didChangeDegreesPresention(isCelsius: Bool) {
+    func willAppear() {
+        delegate?.setDegrees(isCelsius: isCelsius)
+    }
+    
+    func ChangeDegreesPresention(isCelsius: Bool) {
         self.isCelsius = isCelsius
         delegate?.setDegrees(isCelsius: isCelsius)
-        for viewModel in displayedDaysCellViewModels {
-            viewModel.isCelsius = isCelsius
+        changeDegreesTypeInViewModels()
+    }
+    
+    func changeDegreesTypeInViewModels() {
+        for item in items {
+            switch item {
+            case .current(viewModel: let viewModel):
+                viewModel.isCelsius = self.isCelsius
+            case .daily(viewModel: let viewModel):
+                viewModel.isCelsius = self.isCelsius
+            }
+            delegate?.reloadData()
         }
-        mainCitiesViewModel.isCelsius = isCelsius
-        delegate?.updateMainDegreesUI()
-        delegate?.reloadData()
     }
     
     var numberOfRows: Int {
-        return displayedDaysCellViewModels.count
+        return items.count
     }
     
-    func getCellViewModelForCell(at indexPath: IndexPath)-> SingleCityCellViewModel {
-        return displayedDaysCellViewModels[indexPath.row]
+    func getItem(for indexPath: IndexPath) -> SingleCityItemType {
+        return items[indexPath.row]
     }
     
     func start() {
-        delegate?.updateUI()
         delegate?.showLoader()
-        guard let city = choosenCityCellViewModel.cityName else {return}
-        ApiManager.shared.fetchFiveDaysWeatherData(with: city) {[weak self] result in
+        ApiManager.shared.fetchFiveDaysWeatherData(with: choosenCityWeatherData.name) {[weak self] result in
             guard let self = self else {return}
             DispatchQueue.main.async {
                 self.delegate?.removeLoader()
@@ -63,25 +79,14 @@ class SingleCityViewModel {
                 case .success(let weatherData):
                     let filterdWeather = weatherData.filter {$0.dt_txt.contains("00:00:00")}
                     for weather in filterdWeather {
-                        self.displayedDaysCellViewModels.append(SingleCityCellViewModel(currentWeather: weather))
+                        self.items.append(SingleCityItemType.daily(viewModel: DailyWeatherCellViewModel(currentWeather: weather)))
                     }
                 case .failure(let error):
                     self.delegate?.showError(with: error.localizedDescription)
                 }
-                self.didChangeDegreesPresention(isCelsius: self.isCelsius)
+                self.changeDegreesTypeInViewModels()
+                self.delegate?.reloadData()
             }
-        }
-    }
-    
-    var degrees: String {
-        return createDegrees(min: choosenCityCellViewModel.minDegrees, max: choosenCityCellViewModel.maxDegrees)
-    }
-    
-    func createDegrees(min: Int, max: Int)-> String {
-        if isCelsius {
-        return "\(min)°-\(max)°"
-        } else {
-        return "\((min * Int(1.8)) + 32)°-\((max * Int(1.8)) + 32)°"
         }
     }
 }

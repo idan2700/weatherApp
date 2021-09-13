@@ -17,4 +17,14 @@ struct DayWeatherData: Codable {
     let weather: [Weather]
 }
 
-
+extension DayWeatherData {
+    func createDegrees(isCelsius: Bool)-> String {
+        let min = Int(main.temp_min)
+        let max = Int(main.temp_max)
+        if isCelsius {
+            return "\(min)°-\(max)°"
+        } else {
+           return "\((min * Int(1.8)) + 32)°-\((max * Int(1.8)) + 32)°"
+        }
+    }
+}

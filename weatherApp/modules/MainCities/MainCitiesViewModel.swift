@@ -28,11 +28,7 @@ class MainCitiesViewModel {
     var choosenViewModel: MainCitiesCellViewModel!
     var isCelsius = true
     
-    func willAppear() {
-        self.didChangeDegreesPresention(isCelsius: self.isCelsius)
-    }
-    
-    func didChangeDegreesPresention(isCelsius: Bool) {
+    func ChangeDegreesPresention(isCelsius: Bool) {
         self.isCelsius = isCelsius
         delegate?.setDegrees(isCelsius: isCelsius)
         for viewModel in displayedCitiesCellViewModels {
@@ -88,6 +84,13 @@ class MainCitiesViewModel {
                 delegate?.showNoCityLabel()
             }
         }
+        delegate?.reloadData()
+    }
+}
+
+extension MainCitiesViewModel: isCelsiusDelegate {
+    func didPick(isCelsius: Bool) {
+        ChangeDegreesPresention(isCelsius: isCelsius)
         delegate?.reloadData()
     }
 }

@@ -26,23 +26,18 @@ class MainCitiesViewController: UIViewController {
         searchBar.delegate = self
         viewModel.start()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
-        viewModel.willAppear()
-    }
 
     @IBAction func celsiusPressed(_ sender: UIBarButtonItem) {
-        viewModel.didChangeDegreesPresention(isCelsius: true)
+        viewModel.ChangeDegreesPresention(isCelsius: true)
     }
     @IBAction func fahrenheitPressed(_ sender: UIBarButtonItem) {
-        viewModel.didChangeDegreesPresention(isCelsius: false)
+        viewModel.ChangeDegreesPresention(isCelsius: false)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == K.Segue.mainToSingle {
             guard let singleCityVC = segue.destination as? SingleCityViewController else {return}
-            singleCityVC.viewModel = SingleCityViewModel(choosenCityCellViewModel: viewModel.choosenViewModel, isCelsius: viewModel.isCelsius, mainCitiesViewModel: viewModel)
+            singleCityVC.viewModel = SingleCityViewModel(choosenCityWeatherData: viewModel.choosenViewModel.currentWeather, isCelsius: viewModel.isCelsius, isCelsiusDelegate: self.viewModel)
         }
     }
 }

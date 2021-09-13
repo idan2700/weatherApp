@@ -27,11 +27,16 @@ class SingleCityViewController: UIViewController {
         viewModel.start()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        viewModel.willAppear()
+    }
+    
     @IBAction func celsiusPressed(_ sender: UIBarButtonItem) {
-        viewModel.didChangeDegreesPresention(isCelsius: true)    }
+        viewModel.ChangeDegreesPresention(isCelsius: true)    }
     
     @IBAction func fahrenheitPressed(_ sender: UIBarButtonItem) {
-        viewModel.didChangeDegreesPresention(isCelsius: false)
+        viewModel.ChangeDegreesPresention(isCelsius: false)
     }
 }
 
@@ -41,20 +46,21 @@ extension SingleCityViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: K.Cell.singleCity) as? SingleCityTableViewCell else {return UITableViewCell()}
-        let cellViewModel = viewModel.getCellViewModelForCell(at: indexPath)
-        cell.configure(with: cellViewModel)
-        return cell
+        let item = viewModel.getItem(for: indexPath)
+        switch item {
+        case .current(viewModel: let currentWeatherCellViewModel):
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: K.Cell.currentWeather) as? CurrentWeatherTableViewCell else {return UITableViewCell()}
+            cell.configure(with: currentWeatherCellViewModel)
+            return cell
+        case .daily(viewModel: let dailyWeatherCellViewModel):
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: K.Cell.dailyWeather) as? DailyWeatherTableViewCell else {return UITableViewCell()}
+            cell.configure(with: dailyWeatherCellViewModel)
+            return cell
+        }
     }
 }
 
 extension SingleCityViewController: SingleCityViewModelDelegate {
-    func updateUI() {
-        cityName.text = viewModel.choosenCityCellViewModel.cityName
-        currentDegrees.text = viewModel.choosenCityCellViewModel.degrees
-        currentDescripition.text = viewModel.choosenCityCellViewModel.description
-        currentWeatherIcon.image = viewModel.choosenCityCellViewModel.iconImage
-    }
     
     func setDegrees(isCelsius: Bool) {
         if isCelsius {
@@ -84,9 +90,5 @@ extension SingleCityViewController: SingleCityViewModelDelegate {
         let alert = UIAlertController(title: message, message: "", preferredStyle: .alert)
         alert.addAction(.init(title: "OK", style: .cancel, handler: nil))
         present(alert, animated: true, completion: nil)
-    }
-    
-    func updateMainDegreesUI() {
-        currentDegrees.text = viewModel.degrees
     }
 }
