@@ -8,22 +8,18 @@
 import Foundation
 import UIKit
 
-protocol SingleCityCellViewModelDelegate: AnyObject {
+protocol DailyWeatherCellViewModelDelegate: AnyObject {
     func updateIcon(with image: UIImage)
 }
 
-class SingleCityCellViewModel {
-    var isCelsius: Bool
-    weak var delegate: SingleCityCellViewModelDelegate?
-    private var currentWeather: DayWeatherData
-    var iconImage = UIImage() {
-       didSet {
-        delegate?.updateIcon(with: iconImage)
-       }
-   }
+class DailyWeatherCellViewModel {
     
-    init(currentWeather: DayWeatherData, isCelsius: Bool) {
-        self.isCelsius = isCelsius
+    var isCelsius: Bool = true
+    weak var delegate: DailyWeatherCellViewModelDelegate?
+    
+    private var currentWeather: DayWeatherData
+    
+    init(currentWeather: DayWeatherData) {
         self.currentWeather = currentWeather
         getIcon()
     }
@@ -43,18 +39,14 @@ class SingleCityCellViewModel {
     }
     
     var degrees: String {
-        return createDegrees(min: currentWeather.main.temp_min, max: currentWeather.main.temp_max)
+        return String().createDegrees(isCelsius: isCelsius, min: currentWeather.main.temp_min, max: currentWeather.main.temp_max)
     }
     
-    func createDegrees(min: Double, max: Double)-> String {
-        let min = Int(min)
-        let max = Int(max)
-        if isCelsius == true {
-        return "\(min)°-\(max)°"
-        } else {
-        return "\((min * Int(1.8)) + 32)°-\((max * Int(1.8)) + 32)°"
-        }
-    }
+    var iconImage = UIImage() {
+       didSet {
+        delegate?.updateIcon(with: iconImage)
+       }
+   }
     
     func getIcon() {
         ApiManager.shared.getImageIcon(with: currentWeather.weather[0].icon) { result in

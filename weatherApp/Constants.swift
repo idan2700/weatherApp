@@ -16,8 +16,9 @@ struct K {
     }
     
     struct Cell {
-        static let mainCities = "MainCitiesCell"
-        static let singleCity = "SingleCityCell"
+        static let mainCities = "mainCitiesCell"
+        static let dailyWeather = "dailyWeatherCell"
+        static let currentWeather = "currentWeatherCell"
     }
     
     struct Segue {

@@ -9,8 +9,7 @@ import Foundation
 import UIKit
 
 protocol MainCitiesViewModelDelegate: AnyObject {
-    func chooseCelsius()
-    func chooseFahrenheit()
+    func setDegrees(isCelsius: Bool)
     func reloadData()
     func moveToSingleCityVC()
     func showLoader()
@@ -22,24 +21,18 @@ protocol MainCitiesViewModelDelegate: AnyObject {
 
 class MainCitiesViewModel {
     
-    weak var delegate: MainCitiesViewModelDelegate?
-    var choosenViewModel: MainCitiesCellViewModel!
     private var allcitiesCellViewModels = [MainCitiesCellViewModel]()
     private var displayedCitiesCellViewModels = [MainCitiesCellViewModel]()
-    var isTempInCelsius = true
     
-    func didTapCelsius() {
-        delegate?.chooseCelsius()
-        for viewModel in displayedCitiesCellViewModels {
-            viewModel.isCelsius = true
-        }
-        delegate?.reloadData()
-    }
+    weak var delegate: MainCitiesViewModelDelegate?
+    var choosenViewModel: MainCitiesCellViewModel!
+    var isCelsius = true
     
-    func didTapFahrenheit() {
-        delegate?.chooseFahrenheit()
+    func ChangeDegreesPresention(isCelsius: Bool) {
+        self.isCelsius = isCelsius
+        delegate?.setDegrees(isCelsius: isCelsius)
         for viewModel in displayedCitiesCellViewModels {
-            viewModel.isCelsius = false
+            viewModel.isCelsius = isCelsius
         }
         delegate?.reloadData()
     }
@@ -65,30 +58,39 @@ class MainCitiesViewModel {
                 self.delegate?.removeLoader()
                 switch result {
                 case .success(let weatherData):
-                    for weather in weatherData.list {
-                        self.displayedCitiesCellViewModels.append(MainCitiesCellViewModel(currentWeather: weather, isCelsius: self.isTempInCelsius))
+                    for weather in weatherData {
+                        self.allcitiesCellViewModels.append(MainCitiesCellViewModel(currentWeather: weather))
                     }
                 case .failure(let error):
                     self.delegate?.showError(with: error.localizedDescription)
                 }
-                self.allcitiesCellViewModels = self.displayedCitiesCellViewModels
+                self.displayedCitiesCellViewModels = self.allcitiesCellViewModels
                 self.delegate?.reloadData()
             }
         }
     }
-    
+ 
     func didChangeText(_ searchText: String) {
-        let filterd = allcitiesCellViewModels.filter {($0.cityName?.contains(searchText)) ?? false}
-        if filterd.count > 0 {
-            displayedCitiesCellViewModels = filterd
-            delegate?.hideNoCityLabel()
-        } else if searchText.isEmpty == false {
-            displayedCitiesCellViewModels = filterd
-            delegate?.showNoCityLabel()
-        } else {
+        if searchText.isEmpty {
             delegate?.hideNoCityLabel()
             displayedCitiesCellViewModels = allcitiesCellViewModels
+        } else {
+            let filterd = allcitiesCellViewModels.filter {($0.cityName?.contains(searchText)) ?? false}
+            if filterd.count > 0 {
+                displayedCitiesCellViewModels = filterd
+                delegate?.hideNoCityLabel()
+            } else {
+                displayedCitiesCellViewModels = [MainCitiesCellViewModel]()
+                delegate?.showNoCityLabel()
+            }
         }
+        delegate?.reloadData()
+    }
+}
+
+extension MainCitiesViewModel: isCelsiusDelegate {
+    func didPick(isCelsius: Bool) {
+        ChangeDegreesPresention(isCelsius: isCelsius)
         delegate?.reloadData()
     }
 }
